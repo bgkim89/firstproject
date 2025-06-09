@@ -1,124 +1,94 @@
 import streamlit as st
+import random
 
-# 앱 제목
-st.title("🎬 MBTI 기반 수학·과학 명작 영화 추천기")
-st.markdown("당신의 성격 유형에 꼭 맞는 과학/수학 영화 한 편, 골라드릴게요!")
+# ----------------------
+# 1. 설정
+# ----------------------
+st.set_page_config(page_title="MBTI 기반 K-pop 추천기", layout="centered")
 
-# MBTI 리스트
-mbti_types = [
-    "INTJ", "INTP", "ENTJ", "ENTP",
-    "INFJ", "INFP", "ENFJ", "ENFP",
-    "ISTJ", "ISFJ", "ESTJ", "ESFJ",
-    "ISTP", "ISFP", "ESTP", "ESFP"
-]
-
-# MBTI 별 추천 영화 데이터
-mbti_movies = {
-    "INTJ": {
-        "title": "인터스텔라",
-        "desc": "복잡한 물리 이론과 우주 탐사를 결합한 미래지향적 이야기.",
-        "field": "천체물리학, 상대성 이론",
-        "youtube": "https://www.youtube.com/watch?v=zSWdZVtXT7E"
-    },
-    "INTP": {
-        "title": "굿 윌 헌팅",
-        "desc": "내성적이지만 천재적인 수학 능력을 지닌 청년의 성장 이야기.",
-        "field": "수학, 심리학",
-        "youtube": "https://www.youtube.com/watch?v=PaZVjZEFkRs"
-    },
-    "ENTJ": {
-        "title": "소셜 네트워크",
-        "desc": "논리와 추진력으로 세상을 바꾼 창업자의 전략적 이야기.",
-        "field": "IT, 창업, 알고리즘",
-        "youtube": "https://www.youtube.com/watch?v=lB95KLmpLR4"
-    },
-    "ENTP": {
-        "title": "인셉션",
-        "desc": "창의적인 아이디어와 논리적 세계관이 뒤섞인 꿈의 해석.",
-        "field": "신경과학, 인지심리",
-        "youtube": "https://www.youtube.com/watch?v=YoHD9XEInc0"
-    },
-    "INFJ": {
-        "title": "콘택트",
-        "desc": "외계 생명체와의 접촉 속에서 과학과 철학의 경계를 탐구.",
-        "field": "천문학, 철학",
-        "youtube": "https://www.youtube.com/watch?v=TRcZavGpt5A"
-    },
-    "INFP": {
-        "title": "어바웃 타임",
-        "desc": "시간여행이라는 소재를 통해 삶과 감정을 성찰하는 이야기.",
-        "field": "시간 개념, 인생철학",
-        "youtube": "https://www.youtube.com/watch?v=T7A810duHvw"
-    },
-    "ENFJ": {
-        "title": "히든 피겨스",
-        "desc": "NASA에서 활약한 흑인 여성 수학자들의 감동 실화.",
-        "field": "수학, 천문학, 사회정의",
-        "youtube": "https://www.youtube.com/watch?v=RK8xHq6dfAo"
-    },
-    "ENFP": {
-        "title": "마션",
-        "desc": "화성에 홀로 남겨졌지만 긍정과 창의성으로 과학을 극복하다.",
-        "field": "생명과학, 엔지니어링",
-        "youtube": "https://www.youtube.com/watch?v=ej3ioOneTy8"
-    },
-    "ISTJ": {
-        "title": "이미테이션 게임",
-        "desc": "전쟁 중 기계적 분석과 끈기로 암호를 해독한 실화.",
-        "field": "컴퓨터 과학, 논리",
-        "youtube": "https://www.youtube.com/watch?v=S5CjKEFb-sM"
-    },
-    "ISFJ": {
-        "title": "히든 피겨스",
-        "desc": "묵묵히 헌신한 여성들의 수학적 기여와 팀워크.",
-        "field": "수학, 조직 내 기여",
-        "youtube": "https://www.youtube.com/watch?v=RK8xHq6dfAo"
-    },
-    "ESTJ": {
-        "title": "체르노빌",
-        "desc": "사실과 원칙 중심의 위기 대응과 과학적 진실 파헤치기.",
-        "field": "원자력공학, 시스템 분석",
-        "youtube": "https://www.youtube.com/watch?v=s9APLXM9Ei8"
-    },
-    "ESFJ": {
-        "title": "빅 히어로",
-        "desc": "따뜻한 마음과 과학 기술이 어우러진 힐링 로봇 이야기.",
-        "field": "로봇공학, 팀워크",
-        "youtube": "https://www.youtube.com/watch?v=z3biFxZIJOQ"
-    },
-    "ISTP": {
-        "title": "그래비티",
-        "desc": "냉정한 이성과 기술적 대응으로 생존을 극복하는 이야기.",
-        "field": "우주공학, 생존기술",
-        "youtube": "https://www.youtube.com/watch?v=OiTiKOy59o4"
-    },
-    "ISFP": {
-        "title": "월-E",
-        "desc": "감성과 환경 메시지를 지닌 로봇의 과학적 판타지.",
-        "field": "지구과학, 환경공학",
-        "youtube": "https://www.youtube.com/watch?v=alIq_wG9FNk"
-    },
-    "ESTP": {
-        "title": "아이언맨",
-        "desc": "즉흥적이지만 천재적인 발명가의 액션과 과학 이야기.",
-        "field": "기계공학, 에너지",
-        "youtube": "https://www.youtube.com/watch?v=8ugaeA-nMTc"
-    },
-    "ESFP": {
-        "title": "백 투 더 퓨처",
-        "desc": "유쾌하고 모험적인 성격에 딱 맞는 시간 여행 이야기.",
-        "field": "물리학, 시간 개념",
-        "youtube": "https://www.youtube.com/watch?v=qvsgGtivCgs"
-    }
+# ----------------------
+# 2. 데이터: MBTI별 K-pop 추천곡
+# ----------------------
+kpop_recommendations = {
+    "INFP": [
+        {
+            "title": "Love Poem",
+            "artist": "아이유 (IU)",
+            "year": 2019,
+            "meaning": "아픔 속 누군가에게 따뜻한 위로가 되고 싶은 마음을 담은 곡.",
+            "youtube": "https://www.youtube.com/watch?v=0-q1KafFCLU",
+            "color": "#FFDEE9"  # 연핑크
+        },
+        {
+            "title": "Spring Day",
+            "artist": "방탄소년단 (BTS)",
+            "year": 2017,
+            "meaning": "그리움과 기다림을 표현한 따뜻한 감성의 명곡."
+        },
+        {
+            "title": "Palette",
+            "artist": "아이유 (feat. G-DRAGON)",
+            "year": 2017,
+            "meaning": "성장하면서 자아를 찾아가는 과정을 담담하게 그린 노래."
+        },
+        {
+            "title": "8",
+            "artist": "아이유 & SUGA",
+            "year": 2020,
+            "meaning": "잃어버린 소중한 기억에 대한 회상을 전하는 감성적인 곡."
+        },
+        {
+            "title": "Lonely",
+            "artist": "종현 (Jonghyun)",
+            "year": 2017,
+            "meaning": "외로움에 대한 깊은 공감과 이해를 노래한 곡."
+        }
+    ],
+    # 필요한 경우 다른 MBTI 유형도 추가 가능
 }
 
-# 사용자 MBTI 선택
-selected_mbti = st.selectbox("당신의 MBTI 유형을 선택하세요:", mbti_types)
+# ----------------------
+# 3. UI
+# ----------------------
+st.markdown("<h1 style='text-align:center;'>🎀 MBTI로 알아보는 당신의 K-pop 💖</h1>", unsafe_allow_html=True)
 
-# 결과 출력
+mbti_types = list(kpop_recommendations.keys())
+selected_mbti = st.selectbox("당신의 MBTI를 선택해주세요", mbti_types)
+
+start_year, end_year = st.slider(
+    "🎧 추천받고 싶은 노래의 연도 범위를 선택하세요",
+    min_value=2005,
+    max_value=2025,
+    value=(2015, 2023)
+)
+
+# ----------------------
+# 4. 추천 결과
+# ----------------------
 if selected_mbti:
-    movie = mbti_movies[selected_mbti]
-    st.subheader(f"🎥 {selected_mbti} 유형을 위한 추천 영화: {movie['title']}")
-    st.markdown(f"**관련 분야:** {movie['field']}")
-    st.write(movie["desc"])
-    st.video(movie["youtube"])
+    songs = kpop_recommendations[selected_mbti]
+    filtered_songs = [s for s in songs if start_year <= s["year"] <= end_year]
+
+    if not filtered_songs:
+        st.error("😢 해당 연도에 추천할 곡이 없어요. 연도를 조정해 주세요!")
+    else:
+        # 배경 색상 적용
+        theme_color = filtered_songs[0].get("color", "#FFC0CB")  # 기본 연핑크
+        st.markdown(
+            f"""
+            <style>
+            .stApp {{
+                background-color: {theme_color};
+                font-family: 'Nanum Gothic', sans-serif;
+            }}
+            </style>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.subheader(f"🌟 {selected_mbti} 유형에게 어울리는 K-pop Top 5!")
+        for i, song in enumerate(filtered_songs[:5]):
+            st.markdown(f"### {i+1}. {song['artist']} - *{song['title']}* ({song['year']})")
+            st.markdown(f"💬 _{song['meaning']}_")
+            if i == 0 and "youtube" in song:
+                st.video(song["youtube"])
